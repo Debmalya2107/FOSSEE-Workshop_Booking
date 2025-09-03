@@ -62,7 +62,7 @@ workshop_booking-master/
 ⚙️ Installation & Setup
 ------------------------------------------------------------
 1. Clone the repository
-   git clone https://github.com/<your-username>/workshop_booking.git
+   git clone https://github.com/Debmalya2107/FOSSEE-Workshop_Booking.git
    cd workshop_booking
 
 2. Create & activate a virtual environment
