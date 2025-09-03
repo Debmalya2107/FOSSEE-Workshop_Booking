@@ -1,0 +1,57 @@
+{% extends 'workshop_app/base.html' %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block content %}
+<style>
+    label.required::after {
+        content: " *";
+        color: red;
+    }
+    .errorlist {
+        color: red;
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-primary shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">Coordinator Registration Form</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Render form as table -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                {{ form.as_table }}
+                            </table>
+                        </div>
+
+                        <!-- Show form errors at the top if any -->
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <h5 class="text-center"><strong>Please correct the errors below</strong></h5>
+                                {{ form.errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Submit button -->
+                        <div class="text-right">
+                            <button class="btn btn-success px-4" type="submit">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

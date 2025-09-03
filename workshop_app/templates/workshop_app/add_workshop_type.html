@@ -1,0 +1,60 @@
+{% extends 'workshop_app/base.html' %}
+
+{% block title %}
+    Add New Workshop Type
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="text-center my-3">Create New Workshop Type</h2>
+        <hr>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <!-- Workshop Name -->
+            <div class="row my-3">
+                <div class="col-3 font-weight-bold">Workshop Name :</div>
+                <div class="col text-left">
+                    <div class="row"><div class="col">{{ form.name }}</div></div>
+                    <div class="row m-1 text-danger"><div class="col">{{ form.name.errors }}</div></div>
+                </div>
+            </div>
+
+            <!-- Duration -->
+            <div class="row my-3">
+                <div class="col-3 font-weight-bold">Duration :</div>
+                <div class="col text-left">
+                    <div class="row"><div class="col">{{ form.duration }}</div></div>
+                    <div class="row m-1 text-muted"><div class="col">{{ form.duration.help_text }}</div></div>
+                    <div class="row m-1 text-danger"><div class="col">{{ form.duration.errors }}</div></div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="row my-3">
+                <div class="col-3 font-weight-bold">Description :</div>
+                <div class="col text-left">
+                    <div class="row"><div class="col">{{ form.description }}</div></div>
+                    <div class="row m-1 text-danger"><div class="col">{{ form.description.errors }}</div></div>
+                </div>
+            </div>
+
+            <!-- Terms & Conditions -->
+            <div class="row my-3">
+                <div class="col-3 font-weight-bold">Terms and Conditions :</div>
+                <div class="col text-left">
+                    <div class="row"><div class="col">{{ form.terms_and_conditions }}</div></div>
+                    <div class="row m-1 text-danger"><div class="col">{{ form.terms_and_conditions.errors }}</div></div>
+                </div>
+            </div>
+
+            <!-- Submit + Cancel -->
+            <div class="row my-4">
+                <div class="col text-right">
+                    <button type="submit" class="btn btn-md btn-success mx-2">Create</button>
+                    <a href="{% url 'workshop_app:index' %}" class="btn btn-md btn-secondary">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

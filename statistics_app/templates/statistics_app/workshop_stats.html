@@ -1,0 +1,471 @@
+{% extends 'workshop_app/base.html' %}
+
+{% block title %}
+ Workshop Statistics
+{% endblock %}
+
+{% block extra %}
+    <!-- jQuery UI CSS for datepicker and dialog -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <!-- jQuery and jQuery UI -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google GeoChart -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <style>
+        /* Container spacing */
+        .container {
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Styled fieldset with toggle buttons */
+        fieldset[data-mini="true"] {
+            border: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        fieldset[data-mini="true"] label {
+            cursor: pointer;
+            background: #4a90e2;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            user-select: none;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            text-align: center;
+        }
+        fieldset[data-mini="true"] input[type="radio"] {
+            display: none;
+        }
+        fieldset[data-mini="true"] input[type="radio"]:checked + label {
+            background: linear-gradient(45deg, #9013fe, #4a90e2);
+            box-shadow: 0 0 12px rgba(144, 19, 254, 0.7);
+            color: #fff;
+        }
+        fieldset[data-mini="true"] label:hover {
+            background-color: #357ABD;
+            box-shadow: 0 0 8px rgba(53, 122, 189, 0.6);
+        }
+
+        /* Form group styling */
+        .form-group label {
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .form-group input[type="text"] {
+            width: 120px;
+            display: inline-block;
+            margin-right: 1rem;
+        }
+        .form-group button {
+            margin-right: 0.5rem;
+            min-width: 90px;
+        }
+
+        /* Messages styling */
+        .messages .alert {
+            margin-top: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+        }
+
+        /* Table styling */
+        table.table {
+            border-radius: 0.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            background: #fff;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+            margin-top: 1rem;
+        }
+        table.table thead tr {
+            background: linear-gradient(45deg, #4a90e2, #9013fe);
+            color: white;
+            font-weight: 700;
+        }
+        table.table thead th {
+            padding: 0.75rem 1rem;
+            border: none;
+        }
+        table.table tbody tr {
+            transition: background-color 0.3s ease;
+            cursor: default;
+        }
+        table.table tbody tr:hover {
+            background-color: #e0e7ff;
+        }
+        table.table tbody td {
+            padding: 0.75rem 1rem;
+            vertical-align: middle;
+            border: none;
+        }
+
+        /* Pagination styling */
+        .Page-Nav nav ul.pagination {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .Page-Nav nav ul.pagination li.page-item a.page-link {
+            color: #4a90e2;
+            font-weight: 600;
+            border-radius: 0.3rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .Page-Nav nav ul.pagination li.page-item a.page-link:hover {
+            background-color: #4a90e2;
+            color: white;
+            text-decoration: none;
+        }
+        .Page-Nav nav ul.pagination li.page-item span.current {
+            font-weight: 700;
+            color: #9013fe;
+            padding: 0.375rem 0.75rem;
+        }
+
+        /* Visualization container */
+        #visualization {
+            width: 90%;
+            max-width: 900px;
+            height: 500px;
+            margin: 2rem auto;
+            display: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 12px 30px rgba(74, 144, 226, 0.3);
+            background: white;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            fieldset[data-mini="true"] {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            .form-group input[type="text"] {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            .form-group button {
+                width: 48%;
+                margin-bottom: 0.5rem;
+            }
+            table.table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+
+    <script>
+        $(function() {
+            // Initialize datepickers with constraints
+            var dateToday = new Date();
+            var upto = new Date();
+            dateToday.setDate(dateToday.getDate() - 1);
+            upto.setFullYear(dateToday.getFullYear() + 1);
+
+            var dateFormat = "yy-mm-dd";
+
+            var from = $("#from").datepicker({
+                defaultDate: "+1w",
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                maxDate: dateToday,
+                dateFormat: dateFormat,
+                onClose: function(selectedDate) {
+                    $("#to").datepicker("option", "minDate", selectedDate);
+                }
+            });
+
+            var to = $("#to").datepicker({
+                defaultDate: "+1w",
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                minDate: dateToday,
+                maxDate: upto,
+                dateFormat: dateFormat,
+                onClose: function(selectedDate) {
+                    $("#from").datepicker("option", "maxDate", selectedDate);
+                }
+            });
+
+            // Chart.js setup
+            var ctx1 = document.getElementById("myChartPie").getContext('2d');
+            var myChart;
+
+            $('input[type=radio][name="radio-1"]').change(function() {
+                if (this.value === 'NWPM') {
+                    if (myChart) myChart.destroy();
+
+                    $("#visualization").hide();
+
+                    myChart = new Chart(ctx1, {
+                        type: 'bar',
+                        data: {
+                            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                            datasets: [{
+                                label: 'Number of workshops per Month for ' + new Date().getFullYear(),
+                                data: {{ workshop_count }},
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(242, 38, 19, 0.2)',
+                                    'rgba(25, 91, 13, 0.2)',
+                                    'rgba(54, 12, 235, 0.2)',
+                                    'rgba(150, 40, 27, 0.2)',
+                                    'rgba(66, 114, 155, 0.2)',
+                                    'rgba(219, 10, 91, 0.2)',
+                                    'rgba(191, 191, 191, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(242, 38, 19, 1)',
+                                    'rgba(25, 91, 13, 1)',
+                                    'rgba(54, 12, 235, 1)',
+                                    'rgba(150, 40, 27, 1)',
+                                    'rgba(66, 114, 155, 1)',
+                                    'rgba(219, 10, 91, 1)',
+                                    'rgba(191, 191, 191, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else if (this.value === 'OWC') {
+                    if (myChart) myChart.destroy();
+
+                    $("#visualization").hide();
+
+                    myChart = new Chart(ctx1, {
+                        type: 'pie',
+                        data: {
+                            labels: {{ workshoptype_count.0|safe }},
+                            datasets: [{
+                                data: {{ workshoptype_count.1 }},
+                                backgroundColor: [
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(191, 191, 1, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true
+                        }
+                    });
+                } else if (this.value === 'MOIN') {
+                    if (myChart) myChart.destroy();
+
+                    var dWidth = $(window).width() * 0.9;
+                    var dHeight = $(window).height() * 0.9;
+
+                    $("#visualization").dialog({
+                        resizable: false,
+                        draggable: true,
+                        title: 'State wise Completed Workshops (Map of India)',
+                        closeOnEscape: true,
+                        stack: true,
+                        zIndex: 10000,
+                        width: dWidth,
+                        height: dHeight,
+                        modal: true,
+                        show: { effect: "fade", duration: 400 },
+                        hide: { effect: "fade", duration: 400 }
+                    });
+
+                    $("#visualization").css('visibility', 'visible');
+
+                    function drawVisualization() {
+                        var data = google.visualization.arrayToDataTable({{ india_map|safe }});
+
+                        var opts = {
+                            region: 'IN',
+                            displayMode: 'regions',
+                            resolution: 'provinces',
+                            datalessRegionColor: 'transparent',
+                            colorAxis: { colors: ['#e6e6e6', '#ff8b3e'] },
+                            legend: { position: 'top' }
+                        };
+
+                        var geochart = new google.visualization.GeoChart(document.getElementById('visualization'));
+                        geochart.draw(data, opts);
+                    }
+
+                    if (google) {
+                        google.charts.load('current', {
+                            packages: ['geochart'],
+                            callback: drawVisualization,
+                            mapsApiKey: '' // Add your Google Maps API key if needed
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+
+    <style>
+        /* Visualization map border */
+        #visualization path {
+            stroke-width: 1;
+            stroke: white;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6" align="left">
+            <fieldset data-mini="true">
+                <input type="radio" name="radio-1" id="radio-1" value="NWPM">
+                <label for="radio-1">Monthly Count</label>
+
+                <input type="radio" name="radio-1" id="radio-2" value="OWC">
+                <label for="radio-2">Overall Count</label>
+
+                <input type="radio" name="radio-1" id="radio-3" value="MOIN">
+                <label for="radio-3">India Map</label>
+            </fieldset>
+        </div>
+
+        {% if show_workshop_stats %}
+        <div align="right" class="col-md-6">
+            <form method="POST" novalidate>
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="from">From</label>
+                    <input type="text" id="from" name="from" autocomplete="off" class="form-control d-inline-block" style="width: 140px;">
+                    <label for="to">to</label>
+                    <input type="text" id="to" name="to" autocomplete="off" class="form-control d-inline-block" style="width: 140px;">
+                    <button class="btn btn-warning btn-sm" type="submit" name="Download" value="Download">Download</button>
+                    <button class="btn btn-info btn-sm" type="submit" name="View" value="View">View</button>
+                </div>
+            </form>
+
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                </div>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
+        <br>
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Coordinator Name</th>
+                    <th>Institute Name</th>
+                    <th>Instructor Name</th>
+                    <th>Workshop Name</th>
+                    <th>Workshop Date</th>
+                    <th>Requested/Proposed By</th>
+                </tr>
+            </thead>
+            {% csrf_token %}
+            <tbody>
+                {% for workshop in upcoming_workshops %}
+                    {% if workshop.proposed_workshop_date %}
+                    <tr>
+                        <td>{{ workshop.proposed_workshop_coordinator.get_full_name|capfirst }}</td>
+                        <td>{{ workshop.proposed_workshop_coordinator.profile.institute|capfirst }}</td>
+                        <td>{{ workshop.proposed_workshop_instructor.get_full_name }}</td>
+                        <td>{{ workshop.proposed_workshop_title.workshoptype_name }}</td>
+                        <td>{{ workshop.proposed_workshop_date|date }}</td>
+                        <td>Coordinator</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td>{{ workshop.requested_workshop_coordinator.get_full_name|capfirst }}</td>
+                        <td>{{ workshop.requested_workshop_coordinator.profile.institute|capfirst }}</td>
+                        <td>{{ workshop.requested_workshop_instructor.get_full_name }}</td>
+                        <td>{{ workshop.requested_workshop_title.workshoptype_name }}</td>
+                        <td>{{ workshop.requested_workshop_date|date }}</td>
+                        <td>Instructor</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Page Navigation -->
+        <div class="container">
+            <div class="Page-Nav" align="center">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm">
+                        <li class="page-item">
+                            {% if upcoming_workshops.has_previous %}
+                            <a class="page-link" tabindex="-1" href="?page={{ upcoming_workshops.previous_page_number }}">Previous</a>
+                            {% endif %}
+                        </li>
+                        <li class="page-item">
+                            <span class="current">
+                                Page {{ upcoming_workshops.number }} of {{ upcoming_workshops.paginator.num_pages }}
+                            </span>
+                        </li>
+                        <li class="page-item">
+                            {% if upcoming_workshops.has_next %}
+                            <a class="page-link" href="?page={{ upcoming_workshops.next_page_number }}">Next</a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% else %}
+        <div class="jumbotron mt-4">
+            <h2>Permission to View Upcoming Workshops is set to false, please set it to true in settings.py</h2>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <canvas id="myChartPie" style="max-width: 100%; height: 400px;"></canvas>
+        </div>
+    </div>
+
+    <div id="visualization"></div>
+</div>
+{% endblock %}

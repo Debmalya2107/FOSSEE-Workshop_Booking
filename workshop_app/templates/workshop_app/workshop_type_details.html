@@ -1,0 +1,90 @@
+{% extends 'workshop_app/base.html' %}
+
+{% block title %}
+    View Workshop Details
+{% endblock %}
+
+{% block extra-dependencies %}
+<style>
+    .page-heading {
+        color: #04a9cf;
+        font-weight: bold;
+        text-transform: uppercase;
+        animation: fadeInDown 0.8s ease;
+    }
+
+    .table-hover th {
+        background: #f8f9fa;
+        font-weight: 600;
+        text-align: left;
+    }
+
+    .table-hover td {
+        background: #ffffff;
+    }
+
+    .table-hover tr {
+        transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .table-hover tr:hover {
+        background-color: #e9f7fc;
+        transform: scale(1.01);
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .table-hover th,
+        .table-hover td {
+            font-size: 0.9rem;
+            display: block;
+            width: 100%;
+        }
+        .table-hover tr {
+            display: block;
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table-hover th {
+            background: #04a9cf;
+            color: #fff;
+            padding: 10px;
+        }
+        .table-hover td {
+            padding: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="text-center m-4 page-heading">Workshop Details</h2>
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-hover">
+                <tr class="d-flex animate__animated animate__fadeInUp">
+                    <th class="col-3">Workshop Name :</th>
+                    <td class="col">{{ workshop_type.name }}</td>
+                </tr>
+                <tr class="d-flex animate__animated animate__fadeInUp">
+                    <th class="col-3">Duration :</th>
+                    <td class="col">{{ workshop_type.duration }} day(s)</td>
+                </tr>
+                <tr class="d-flex animate__animated animate__fadeInUp">
+                    <th class="col-3">Description :</th>
+                    <td class="col">{{ workshop_type.description }}</td>
+                </tr>
+                <tr class="d-flex animate__animated animate__fadeInUp">
+                    <th class="col-3">Terms and Conditions :</th>
+                    <td class="col">{{ workshop_type.terms_and_conditions }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}

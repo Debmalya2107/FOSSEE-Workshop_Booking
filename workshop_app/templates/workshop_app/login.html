@@ -1,0 +1,73 @@
+{% extends 'workshop_app/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <!-- Card -->
+            <div class="card shadow-sm border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Sign In</h4>
+                </div>
+
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Error Messages -->
+                        {% if form.errors %}
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <i class="fa fa-exclamation-circle"></i> {{ error|escape }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="fa fa-exclamation-circle"></i> {{ error|escape }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- Username -->
+                        <div class="form-group mb-3">
+                            <label for="id_username" class="form-label">Username</label>
+                            {{ form.username|add_class:"form-control" }}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group mb-4">
+                            <label for="id_password" class="form-label">Password</label>
+                            {{ form.password|add_class:"form-control" }}
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fa fa-sign-in"></i> Sign In
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Footer Links -->
+                <div class="card-footer text-center bg-light">
+                    <a href="{% url 'workshop_app:register' %}" class="d-block mb-2">
+                        <i class="fa fa-user-plus"></i> New here? Sign up
+                    </a>
+                    <a href="{% url 'password_reset' %}" class="d-block">
+                        <i class="fa fa-key"></i> Forgot password?
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "workshop_app/base.html" %}
+
+{% block title %}
+    My Workshops
+{% endblock %}
+
+{% block extra-custom-scripts %}
+<style>
+    .table-heading {
+        color: #04a9cf;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    {% if not workshops %}
+        <!-- Empty state -->
+        <div class="container">
+            <div class="jumbotron text-center">
+                <h1>Welcome {{ user.first_name }}</h1>
+                <p>
+                    Information related to your workshops will appear here.  
+                    You can also propose a workshop as per your availability in the  
+                    <strong>Propose Workshop</strong> tab.
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <h3 class="text-center">The status of your workshops</h3>
+        <br>
+
+        <!-- Accepted Workshops -->
+        <div class="container mb-5">
+            <h3 class="text-center table-heading"><strong>Workshops Accepted</strong></h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Workshop Name</th>
+                            <th>Instructor Name</th>
+                            <th>Workshop Day</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for workshop in workshops %}
+                            {% if workshop.status %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'workshop_app:workshop_details' workshop.id %}">
+                                            {{ workshop.workshop_type|capfirst }}
+                                        </a>
+                                    </td>
+                                    <td>{{ workshop.instructor.get_full_name }}</td>
+                                    <td>{{ workshop.date|date:"M d, Y" }}</td>
+                                    <td><span class="badge badge-success">{{ workshop.get_status }}</span></td>
+                                </tr>
+                            {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No accepted workshops yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Proposed Workshops -->
+        <div class="container mb-5">
+            <h3 class="text-center table-heading"><strong>Workshops Proposed By Me</strong></h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Workshop Name</th>
+                            <th>Workshop Day</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for workshop in workshops %}
+                            {% if not workshop.status and workshop.tnc_accepted %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'workshop_app:workshop_details' workshop.id %}">
+                                            {{ workshop.workshop_type|capfirst }}
+                                        </a>
+                                    </td>
+                                    <td>{{ workshop.date|date:"M d, Y" }}</td>
+                                    <td><span class="badge badge-warning">{{ workshop.get_status }}</span></td>
+                                </tr>
+                            {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">No proposed workshops yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

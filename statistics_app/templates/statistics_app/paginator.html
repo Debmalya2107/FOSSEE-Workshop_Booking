@@ -1,0 +1,118 @@
+<style>
+    /* Pagination container */
+    ul.pagination {
+        display: flex;
+        justify-content: center;
+        padding-left: 0;
+        list-style: none;
+        border-radius: 0.5rem;
+        margin: 1.5rem 0;
+        user-select: none;
+    }
+
+    /* Pagination items */
+    ul.pagination .page-item {
+        margin: 0 0.25rem;
+        transition: transform 0.2s ease;
+    }
+    ul.pagination .page-item:hover:not(.active) {
+        transform: scale(1.1);
+        z-index: 1;
+    }
+
+    /* Pagination links */
+    ul.pagination .page-link {
+        color: #4a90e2;
+        background-color: #fff;
+        border: 1px solid #4a90e2;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.3rem;
+        font-weight: 600;
+        transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+    }
+    ul.pagination .page-link:hover, 
+    ul.pagination .page-link:focus {
+        background-color: #4a90e2;
+        color: #fff;
+        text-decoration: none;
+        box-shadow: 0 0 8px rgba(74, 144, 226, 0.6);
+        outline: none;
+    }
+
+    /* Active page */
+    ul.pagination .page-item.active .page-link {
+        background: linear-gradient(45deg, #9013fe, #4a90e2);
+        border-color: #9013fe;
+        color: #fff;
+        cursor: default;
+        box-shadow: 0 0 12px rgba(144, 19, 254, 0.7);
+    }
+
+    /* Disabled states (if any) */
+    ul.pagination .page-item.disabled .page-link {
+        color: #ccc;
+        border-color: #ddd;
+        cursor: not-allowed;
+        background-color: #f9f9f9;
+        box-shadow: none;
+    }
+
+    /* Icons inside pagination */
+    ul.pagination .page-link i.fa {
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+    }
+    ul.pagination .page-link:hover i.fa {
+        color: #fff;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
+        ul.pagination .page-link {
+            padding: 0.4rem 0.6rem;
+            min-width: 32px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+<ul class="pagination pagination">
+    {% if objects.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="?page=1{% if request.GET.from_date %}&from_date={{ request.GET.from_date }}{% endif %}{% if request.GET.to_date %}&to_date={{ request.GET.to_date }}{% endif %}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}{% if request.GET.workshop_type %}&workshop_type={{ request.GET.workshop_type }}{% endif %}{% if request.GET.show_workshops %}&show_workshops={{ request.GET.show_workshops }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Previous">
+            <span aria-hidden="true">
+                <i class="fa fa-angle-double-left"></i>
+            </span>
+            <span class="sr-only">begin</span>
+        </a>
+    </li>
+    {% endif %}
+
+    {% for n in objects.paginator.page_range %}
+        {% if objects.number == n %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ n }}<span class="sr-only">(current)</span></span>
+            </li>
+        {% elif n > objects.number|add:'-5' and n < objects.number|add:'5' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ n }}{% if request.GET.from_date %}&from_date={{ request.GET.from_date }}{% endif %}{% if request.GET.to_date %}&to_date={{ request.GET.to_date }}{% endif %}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}{% if request.GET.workshop_type %}&workshop_type={{ request.GET.workshop_type }}{% endif %}{% if request.GET.show_workshops %}&show_workshops={{ request.GET.show_workshops }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ n }}</a>
+            </li>
+        {% endif %}
+    {% endfor %}
+
+    {% if objects.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ objects.paginator.num_pages }}{% if request.GET.from_date %}&from_date={{ request.GET.from_date }}{% endif %}{% if request.GET.to_date %}&to_date={{ request.GET.to_date }}{% endif %}{% if request.GET.state %}&state={{ request.GET.state }}{% endif %}{% if request.GET.workshop_type %}&workshop_type={{ request.GET.workshop_type }}{% endif %}{% if request.GET.show_workshops %}&show_workshops={{ request.GET.show_workshops }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Next">
+                <span aria-hidden="true">
+                    <i class="fa fa-angle-double-right"></i>
+                </span>
+                <span class="sr-only">end</span>
+            </a>
+        </li>
+    {% endif %}
+</ul>

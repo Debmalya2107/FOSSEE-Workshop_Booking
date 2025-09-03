@@ -1,0 +1,28 @@
+{% extends 'workshop_app/base.html' %}
+
+{% block title %}
+    Logged Out
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <!-- Card -->
+            <div class="card shadow-sm border-0 text-center">
+                <div class="card-body py-5">
+                    <h3 class="text-success mb-3">
+                        <i class="fa fa-check-circle"></i> You have logged out successfully.
+                    </h3>
+                    <p class="lead">
+                        Want to log in again?  
+                        <a href="/" class="text-primary fw-bold">Click here</a>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

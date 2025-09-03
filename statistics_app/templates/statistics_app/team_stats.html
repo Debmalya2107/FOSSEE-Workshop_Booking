@@ -1,0 +1,156 @@
+{% extends 'workshop_app/base.html' %}
+
+{% block title %}
+ Workshop Statistics
+{% endblock %}
+
+{% block extra %}
+    <!-- Include Chart.js CDN if not already included in base -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Container padding */
+        .container-fluid {
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Nav pills styling */
+        .nav-pills.list-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-left: 0;
+        }
+        .nav-pills.list-group .nav-item {
+            width: 100%;
+        }
+        .nav-pills.list-group .nav-link {
+            border-radius: 0.5rem;
+            color: #4a90e2;
+            background-color: #f0f4ff;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border: 2px solid transparent;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+        }
+        .nav-pills.list-group .nav-link:hover {
+            background-color: #4a90e2;
+            color: #fff;
+            border-color: #4a90e2;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.6);
+            text-decoration: none;
+        }
+        .nav-pills.list-group .nav-link.active {
+            background: linear-gradient(45deg, #9013fe, #4a90e2);
+            color: #fff;
+            border-color: #9013fe;
+            box-shadow: 0 0 12px rgba(144, 19, 254, 0.7);
+        }
+
+        /* Chart container fade-in */
+        #myChart {
+            max-width: 100%;
+            height: 400px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        #myChart.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container-fluid .row {
+                flex-direction: column;
+            }
+            .col-md-2 {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            .col-md-8 {
+                width: 100%;
+            }
+            #myChart {
+                height: 300px;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Animate chart container fade-in
+            const chartCanvas = document.getElementById('myChart');
+            setTimeout(() => {
+                chartCanvas.classList.add('visible');
+            }, 100);
+
+            var ctx = chartCanvas.getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: {{ team_labels|safe }},
+                    datasets: [{
+                        data: {{ ws_count|safe }},
+                        label: "Team Members Workshops",
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        hoverBackgroundColor: 'rgba(144, 19, 254, 0.8)',
+                        hoverBorderColor: 'rgba(144, 19, 254, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: {
+                                    weight: '600',
+                                    size: 14
+                                },
+                                color: '#4a90e2'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <ul class="nav nav-pills list-group" role="tablist">
+                {% for team in all_teams %}
+                    <li class="nav-item">
+                        <a href="{% url 'statistics_app:team' team.id %}" class="nav-link list-group-item {% if team.id == current_team_id %}active{% endif %}">
+                            Team {{ forloop.counter }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-8">
+            <br>
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}

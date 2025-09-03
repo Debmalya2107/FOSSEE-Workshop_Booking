@@ -1,0 +1,245 @@
+{% extends 'workshop_app/base.html' %}
+
+{% block title %}
+  Profile Statistics
+{% endblock %}
+
+{% block extra %}
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="{{URL_ROOT}}/static/workshop_app/js/bootstrap-3.3.7.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <style>
+        /* Container padding */
+        .container {
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Styled fieldset and radio buttons as toggle buttons */
+        fieldset[data-mini="true"] {
+            border: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+        fieldset[data-mini="true"] label {
+            cursor: pointer;
+            background: #4a90e2;
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: 25px;
+            font-weight: 600;
+            user-select: none;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 180px;
+            text-align: center;
+        }
+        fieldset[data-mini="true"] input[type="radio"] {
+            display: none;
+        }
+        fieldset[data-mini="true"] input[type="radio"]:checked + label {
+            background: linear-gradient(45deg, #9013fe, #4a90e2);
+            box-shadow: 0 0 12px rgba(144, 19, 254, 0.7);
+            color: #fff;
+        }
+        fieldset[data-mini="true"] label:hover {
+            background-color: #357ABD;
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.6);
+        }
+
+        /* Tables styling */
+        table.table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.75rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: #fff;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        table.table.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        table.table thead tr {
+            background: linear-gradient(45deg, #4a90e2, #9013fe);
+            color: white;
+            font-weight: 700;
+            text-align: left;
+        }
+        table.table thead th {
+            padding: 0.75rem 1rem;
+            border: none;
+        }
+        table.table tbody tr {
+            background: #f9f9f9;
+            transition: background-color 0.3s ease;
+            cursor: default;
+        }
+        table.table tbody tr:hover {
+            background-color: #e0e7ff;
+        }
+        table.table tbody td {
+            padding: 0.75rem 1rem;
+            vertical-align: middle;
+            border: none;
+        }
+        table.table tbody td a {
+            color: #4a90e2;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        table.table tbody td a:hover {
+            color: #9013fe;
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            fieldset[data-mini="true"] {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            fieldset[data-mini="true"] label {
+                min-width: auto;
+                width: 100%;
+            }
+            table.table thead {
+                display: none; /* Hide headers on small screens */
+            }
+            table.table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                background: #fff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                border-radius: 0.5rem;
+                padding: 1rem;
+            }
+            table.table tbody td {
+                display: flex;
+                justify-content: space-between;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid #eee;
+            }
+            table.table tbody td:last-child {
+                border-bottom: none;
+            }
+            table.table tbody td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: #555;
+                flex-basis: 50%;
+            }
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(function() {
+            $("fieldset").controlgroup();
+        });
+
+        $(document).ready(function() {
+            // Initially show instructor data by default
+            $('#radio-1').prop('checked', true).trigger('change');
+
+            $('input[type=radio][name="radio-1"]').change(function() {
+                if (this.value === "CP") {
+                    $('#instructor_data').removeClass('visible').fadeOut(300, function() {
+                        $('#coordinator_data').fadeIn(400).addClass('visible');
+                    });
+                } else {
+                    $('#coordinator_data').removeClass('visible').fadeOut(300, function() {
+                        $('#instructor_data').fadeIn(400).addClass('visible');
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <fieldset data-mini="true">
+                    <input type="radio" name="radio-1" id="radio-1" value="IP">
+                    <label for="radio-1">Instructor Statistics</label>
+
+                    <input type="radio" name="radio-1" id="radio-2" value="CP">
+                    <label for="radio-2">Coordinator Statistics</label>
+                </fieldset>
+            </div>
+        </div>
+
+        <!-- Instructor Data Table -->
+        <table class="table" id="instructor_data" style="display: none;">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Username</th>
+                    <th>Full Name</th>
+                    <th>Institute Name</th>
+                    <th>Phone Number</th>
+                    <th>Workshop Count</th>
+                </tr>
+            </thead>
+            {% csrf_token %}
+            <tbody>
+            {% for profile_data in instructor_data %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ profile_data.profile.user }}</td>
+                    <td>{{ profile_data.profile.user.first_name }} {{ profile_data.profile.user.last_name }}</td>
+                    <td>{{ profile_data.profile.institute }}</td>
+                    <td>{{ profile_data.profile.phone_number }}</td>
+                    <td>{{ profile_data.count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Coordinator Data Table -->
+        <table class="table" id="coordinator_data" style="display: none;">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Institute Name</th>
+                    <th>Phone Number</th>
+                    <th>Registration Date</th>
+                    <th>Workshop Count</th>
+                </tr>
+            </thead>
+            {% csrf_token %}
+            <tbody>
+            {% for profile_data in coordinator_data %}
+                {% if profile_data.count > 0 %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <a href="{{ URL_ROOT }}/view_comment_profile/{{ profile_data.profile.user.id }}">
+                            {{ profile_data.profile.user.get_full_name }}
+                        </a>
+                    </td>
+                    <td>{{ profile_data.profile.institute }}</td>
+                    <td>{{ profile_data.profile.phone_number }}</td>
+                    <td>{{ profile_data.profile.user.date_joined | date }}</td>
+                    <td>{{ profile_data.count }}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

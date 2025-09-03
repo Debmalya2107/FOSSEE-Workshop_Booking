@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>{{ page.title|title }}</title>
+    <link rel="stylesheet" href="{% static 'cms/css/bootstrap.min.css' %}">
+
+    <script src="{% static 'cms/js/jquery-3.4.1.slim.min.js' %}"></script>
+    <script src="{% static 'cms/js/popper.min.js' %}"></script>
+    {{ page.imports | safe }}
+    <script src="{% static 'cms/js/bootstrap.min.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'workshop_app/css/base.css' %}" type="text/css"/>
+
+    <style>
+        /* Gradient background for navbar */
+        nav.navbar {
+            background: linear-gradient(45deg, #4a90e2, #9013fe);
+            transition: background 0.5s ease;
+        }
+        nav.navbar:hover {
+            background: linear-gradient(45deg, #9013fe, #4a90e2);
+        }
+
+        /* Navbar brand styling */
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #fff !important;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            transition: color 0.3s ease;
+        }
+        .navbar-brand:hover {
+            color: #ffd700 !important;
+            text-decoration: none;
+        }
+
+        /* Navbar links styling */
+        .nav-link {
+            color: #e0e0e0 !important;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link:focus {
+            color: #ffd700 !important;
+            text-decoration: none;
+        }
+
+        /* Dropdown menu with subtle shadow and smooth fade */
+        .dropdown-menu {
+            border-radius: 0.3rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+        }
+        .dropdown.show .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .dropdown-item {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .dropdown-item:hover, .dropdown-item:focus {
+            background-color: #4a90e2;
+            color: #fff !important;
+        }
+
+        /* Navbar toggler button color */
+        .navbar-toggler {
+            border-color: #ffd700;
+        }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28255, 215, 0, 0.9%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+
+        /* Base content fade-in animation */
+        .base-content {
+            animation: fadeInUp 0.8s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+            padding: 1rem;
+            max-width: 960px;
+            margin: 5rem auto 2rem auto;
+            background: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .base-content {
+                margin: 6rem 1rem 2rem 1rem;
+                padding: 1rem;
+            }
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+            .nav-link {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark navbar-expand-lg fixed-top">
+    <a class="navbar-brand" href="/">FOSSEE Workshops</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        </ul>
+        <div class="my-2 my-lg-0">
+            <ul class="navbar-nav mr-auto">
+                {% for nav in navs %}
+                    <li class="nav-item">
+                        {% if nav.subnavs %}
+                            <ul class="navbar-nav mr-auto">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="material-icons" style="vertical-align: middle">{{ nav.name }}</span>
+                                    </a>
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        {% for subnav in nav.subnavs %}
+                                        <a class="dropdown-item" href="{{ subnav.link }}">{{ subnav.name }}</a>
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            </ul>
+                        {% else %}
+                            <a class="nav-link" href="{{ nav.link }}">{{ nav.name }}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="base-content">
+    {{ page.content | safe }}
+</div>
+
+</body>
+</html>

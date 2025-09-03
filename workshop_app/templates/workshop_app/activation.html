@@ -1,0 +1,140 @@
+{% extends 'workshop_app/base.html' %}
+
+{% block title %}
+    Awaiting Activation
+{% endblock %}
+
+{% block header %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold text-white" href="/">
+            🚀 FOSSEE Workshops
+        </a>
+        <ul class="navbar-nav ms-auto">
+            {% if request.user.profile.is_email_verified %}
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{% url 'workshop_app:view_profile' %}">
+                        <i class="glyphicon glyphicon-user"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{% url 'workshop_app:logout' %}">
+                        <i class="glyphicon glyphicon-log-out"></i> Logout
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Fade-in animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .status-card {
+        background: #ffffff;
+        border-radius: 15px;
+        padding: 30px;
+        margin-top: 40px;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 0.8s ease-in-out;
+    }
+
+    .status-card h1 {
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #2c3e50;
+    }
+
+    .status-card p {
+        font-size: 16px;
+        color: #555;
+    }
+
+    .status-link {
+        color: #007bff;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .status-link:hover {
+        text-decoration: underline;
+    }
+
+    .jumbotron {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 15px;
+        padding: 30px;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+        .status-card {
+            padding: 20px;
+        }
+        .status-card h1 {
+            font-size: 22px;
+        }
+        .status-card p {
+            font-size: 14px;
+        }
+    }
+</style>
+
+<div class="container">
+    {% if status == '2' %}
+        <div class="status-card">
+            <h1>✅ Email Already Verified</h1>
+            <p>Your email is already verified. Click 
+                <a href="{% url 'workshop_app:index' %}" class="status-link">here</a> to continue.
+            </p>
+        </div>
+
+    {% elif status == '1' %}
+        <script type="text/javascript">
+            window.setTimeout(function () {
+                location.href = "{% url 'workshop_app:register' %}"
+            }, 3000);
+        </script>
+        <div class="status-card">
+            <h1>⚠️ Activation Expired</h1>
+            <p>Your activation link has expired. Please register again.</p>
+        </div>
+
+    {% elif status == '0' %}
+        <div class="status-card">
+            <h1>🎉 Account Activated</h1>
+            <p>Your account has been successfully activated. Click 
+                <a href="{% url 'workshop_app:index' %}" class="status-link">here</a> to login.
+            </p>
+        </div>
+
+    {% else %}
+        <script type="text/javascript">
+            window.setTimeout(function () {
+                location.href = "{% url 'workshop_app:logout' %}"
+            }, 5000);
+        </script>
+        <div class="status-card">
+            <h1>⏳ Activation Awaiting</h1>
+            <p>
+                The activation link has been sent to your email.  
+                It will expire in <strong>24 hours</strong> from registration.  
+                You will be logged out automatically.
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
